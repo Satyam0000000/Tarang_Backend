@@ -9,7 +9,20 @@ const corsMiddleware = cors({
     credentials: true,
 });
 
+//middleware helper
+function runMiddleware(req,res,fn){
+    return new Promise((resolve, reject) => {
+        fn(req,res, (result)=> {
+            if (result instanceof Error) return reject(result);
+            return resolve(result);
+        })
+    })
+}
+
 export default async function handler(req,res) {
+
+    await runMiddleware(req,res,corsMiddleware);
+
     if (req.method !== "POST")
         return res.status(405).json({message : "Method not allowed"})
 
