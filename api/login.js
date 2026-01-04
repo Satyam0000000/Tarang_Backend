@@ -22,6 +22,7 @@ function runMiddleware(req,res,fn){
 
 export default async function handler(req,res){
 
+    try{
     await runMiddleware(req,res,corsMiddleware);
 
     if (req.method === "OPTIONS") {
@@ -33,7 +34,7 @@ export default async function handler(req,res){
     await connectDB();
     const {email, password} = req.body;
     
-    try{
+    
         const user = await User.findOne({email})
         if(!user)
             return res.json({success: false, message: "User not found"})
@@ -49,6 +50,7 @@ export default async function handler(req,res){
 
         res.json({success: true, token, user});
     }catch (err){
-        res.status(500).json({success: false, message: "Servor error"})
+        console.error("Login API error", err)
+        return res.status(500).json({success: false, message: "Servor error"})
     }
 }
