@@ -4,7 +4,7 @@ import cors from "cors"
 
 const corsMiddleware = cors({
     origin: "https://tarang-frontend.vercel.app",
-    methods: ["POST"],
+    methods: ["POST","OPTIONS"],
     credentials: true,
 });
 

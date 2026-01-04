@@ -10,4 +10,5 @@ const EventRegistrationSchema = new mongoose.Schema({
     headForm : String,
 });
 
-export default mongoose.models("EventRegistration", EventRegistrationSchema)
+export default mongoose.models.EventRegistration ||
+  mongoose.model("EventRegistration", EventRegistrationSchema);
