@@ -6,7 +6,7 @@ import cors from "cors"
 
 const corsMiddleware = cors({
     origin: "https://tarang-frontend.vercel.app",
-    methods: ["POST"],
+    methods: ["POST", "OPTIONS"],
     credentials: true,
 });
 
@@ -23,6 +23,10 @@ function runMiddleware(req,res,fn){
 export default async function handler(req,res){
 
     await runMiddleware(req,res,corsMiddleware);
+
+    if (req.method === "OPTIONS") {
+      return res.status(200).end();
+    }
 
     if(req.method !== "POST")
         return res.status(405).json({message: "Method not allowed"})
