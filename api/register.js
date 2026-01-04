@@ -1,6 +1,13 @@
 import bcrypt from "bcrypt"
 import connectDB from "../utils/connectDB"
 import User from "../models/User"
+import cors from "cors"
+
+const corsMiddleware = cors({
+    origin: "https://tarang-frontend.vercel.app",
+    methods: ["POST"],
+    credentials: true,
+});
 
 export default async function handler(req,res) {
     if (req.method !== "POST")
