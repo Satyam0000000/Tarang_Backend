@@ -15,6 +15,14 @@ export default async function handler(req, res) {
   try {
     const { amount, customer } = req.body;
 
+    console.log("Backend received body:", req.body);
+
+    if (!customer?.id) {
+      return res.status(400).json({
+        error: "customer.id is required for Cashfree payment",
+      });
+    }
+
     if (!amount || !customer) {
       return res.status(400).json({ error: "Missing amount or customer data" });
     }
@@ -28,10 +36,10 @@ export default async function handler(req, res) {
         order_amount: amount,
         order_currency: "INR",
         customer_details: {
-          customer_id: String(customer.id || "guest_user"),
-          customer_name: customer.name || "Guest User",
-          customer_email: customer.email || "guest@test.com",
-          customer_phone: customer.phone || "9999999999",
+          customer_id: String(customer.id),
+          customer_name: customer.name,
+          customer_email: customer.email,
+          customer_phone: customer.phone,
         },
        order_meta: {
         return_url: "https://www.tarangclub.online/payment-success?order_id={order_id}",
