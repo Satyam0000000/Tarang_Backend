@@ -17,6 +17,8 @@ const corsMiddleware = cors({
 });
 //middleware helper
 function runMiddleware(req,res,fn){
+
+    runMiddleware(req,res,corsMiddleware);
     return new Promise((resolve, reject) => {
         fn(req,res, (result)=> {
             if (result instanceof Error) return reject(result);
