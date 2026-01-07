@@ -36,11 +36,39 @@ if(req.method !== "POST")
     return res.status(405).json({message: "Method not allowed"});
 await connectDB();
 
-try{
-    const registration = new EventRegistration(req.body);
-    await registration.save();
-    res.status(201).json({success: true, message: "registration succesfull"})
-}catch (err){
-    res.status(500).json({success: false, message: err.message});
+try {
+  const {
+    eventId,
+    eventName,
+    amount,
+    paymentStatus,
+  } = req.body;
+
+  // ❌ Block paid registrations here
+  if (amount > 0 || paymentStatus === "PAID") {
+    return res.status(400).json({
+      success: false,
+      message: "Paid events are handled via payment gateway only",
+    });
+  }
+
+  // ✅ Save FREE event only
+  const registration = new EventRegistration({
+    ...req.body,
+    amount: 0,
+    paymentStatus: "FREE",
+  });
+
+  await registration.save();
+
+  res.status(201).json({
+    success: true,
+    message: "Free event registration successful",
+  });
+} catch (err) {
+  res.status(500).json({
+    success: false,
+    message: err.message,
+  });
 }
 }

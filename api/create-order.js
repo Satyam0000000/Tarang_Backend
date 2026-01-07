@@ -1,4 +1,6 @@
 import axios from "axios";
+import connectDB from "../utils/connectDB";
+import PendingOrder from "../models/PendingOrder";
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "https://www.tarangclub.online");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -13,7 +15,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { amount, customer } = req.body;
+    const { amount, customer, registration, event } = req.body;
 
     console.log("Backend received body:", req.body);
 
@@ -27,7 +29,31 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing amount or customer data" });
     }
 
+    await connectDB();
+
     const orderId = "ORDER_" + Date.now();
+
+    // 🔹 Save pending order BEFORE payment
+    await PendingOrder.create({
+      orderId,
+      customerId: customer.id,
+      name: customer.name,
+      email: customer.email,
+      phone: customer.phone,
+
+      // registration details
+      collegeName: registration?.collegeName,
+      degree: registration?.degree,
+      year: registration?.year,
+      heardFrom: registration?.heardFrom,
+
+      // event details
+      eventId: event?.eventId,
+      eventName: event?.eventName,
+
+      amount,
+      status: "PENDING",
+    });
 
     const response = await axios.post(
       "https://sandbox.cashfree.com/pg/orders",
