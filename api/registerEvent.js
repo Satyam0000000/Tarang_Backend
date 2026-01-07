@@ -1,5 +1,5 @@
 import connectDB from "../utils/connectDB.js";
-import EventRegistration from "../models/EventRegistration"
+import EventRegistration from "../models/EventRegistration.js"
 import cors from "cors"
 
 const allowedOrigins = [

@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt"
 import connectDB from "../utils/connectDB.js"
-import User from "../models/User"
+import User from "../models/User.js"
 import cors from "cors"
 
 const allowedOrigins = [

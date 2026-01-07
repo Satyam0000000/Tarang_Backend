@@ -1,6 +1,6 @@
 import axios from "axios";
 import connectDB from "../utils/connectDB.js";
-import PendingOrder from "../models/PendingOrder";
+import PendingOrder from "../models/PendingOrder.js";
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "https://www.tarangclub.online");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
