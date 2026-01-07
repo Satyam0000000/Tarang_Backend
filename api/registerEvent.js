@@ -1,4 +1,4 @@
-import connectDB from "../utils/connectDB";
+import connectDB from "../utils/connectDB.js";
 import EventRegistration from "../models/EventRegistration"
 import cors from "cors"
 

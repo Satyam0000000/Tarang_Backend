@@ -1,9 +1,9 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const { Cashfree, CFEnvironment } = require("cashfree-pg");
-const connectDB = require("../../utils/connectDB");
-const PendingOrder = require("../../models/PendingOrder");
-const EventRegistration = require("../../models/EventRegistration");
+import express from "express";
+import bodyParser from "body-parser";
+import { Cashfree, CFEnvironment } from "cashfree-pg";
+import connectDB from "../../utils/connectDB.js";
+import PendingOrder from "../../models/PendingOrder.js";
+import EventRegistration from "../../models/EventRegistration.js";
 
 const router = express.Router();
 
@@ -75,4 +75,4 @@ router.post("/cashfree/webhook", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

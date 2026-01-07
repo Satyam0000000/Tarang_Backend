@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt"
-import connectDB from "../utils/connectDB"
+import connectDB from "../utils/connectDB.js"
 import User from "../models/User"
 import cors from "cors"
 

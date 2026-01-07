@@ -1,5 +1,5 @@
 import axios from "axios";
-import connectDB from "../utils/connectDB";
+import connectDB from "../utils/connectDB.js";
 import PendingOrder from "../models/PendingOrder";
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "https://www.tarangclub.online");
