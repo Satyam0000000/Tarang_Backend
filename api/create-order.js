@@ -1,35 +1,15 @@
+import cors from "cors";
 import axios from "axios";
 
-const allowedOrigins = [
-    "https://tarang-frontend.vercel.app",
-  "https://www.tarangclub.online",
-];
-const corsMiddleware = cors({
-    origin: function (origin, callback){
-        if(!origin || allowedOrigins.includes(origin)){
-            callback(null, true);
-        }else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
-    methods: ["POST","OPTIONS"],
-    credentials: true,
-});
-//middleware helper
-function runMiddleware(req,res,fn){
-
-    runMiddleware(req,res,corsMiddleware);
-    return new Promise((resolve, reject) => {
-        fn(req,res, (result)=> {
-            if (result instanceof Error) return reject(result);
-            return resolve(result);
-        })
-    })
-}
-
-
-
 export default async function handler(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "https://www.tarangclub.online");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
