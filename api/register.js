@@ -3,12 +3,21 @@ import connectDB from "../utils/connectDB"
 import User from "../models/User"
 import cors from "cors"
 
+const allowedOrigins = [
+    "https://tarang-frontend.vercel.app",
+  "https://www.tarangclub.online",
+];
 const corsMiddleware = cors({
-    origin: "https://tarang-frontend.vercel.app",
+    origin: function (origin, callback){
+        if(!origin || allowedOrigins.includes(origin)){
+            callback(null, true);
+        }else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
     methods: ["POST","OPTIONS"],
     credentials: true,
 });
-
 //middleware helper
 function runMiddleware(req,res,fn){
     return new Promise((resolve, reject) => {

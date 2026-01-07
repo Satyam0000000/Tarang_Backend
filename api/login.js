@@ -4,9 +4,19 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import cors from "cors"
 
+const allowedOrigins = [
+    "https://tarang-frontend.vercel.app",
+  "https://www.tarangclub.online",
+];
 const corsMiddleware = cors({
-    origin: "https://tarang-frontend.vercel.app",
-    methods: ["POST", "OPTIONS"],
+    origin: function (origin, callback){
+        if(!origin || allowedOrigins.includes(origin)){
+            callback(null, true);
+        }else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    methods: ["POST","OPTIONS"],
     credentials: true,
 });
 
