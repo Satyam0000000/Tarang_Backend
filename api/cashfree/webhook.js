@@ -65,6 +65,7 @@ export default async function handler(req, res) {
         });
 
         pending.status = "PAID";
+        pending.paymentId = cfPaymentId; // ✅ save paymentId in PendingOrder
         await pending.save();
       }
     }

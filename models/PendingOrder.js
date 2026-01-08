@@ -38,6 +38,10 @@ const PendingOrderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    paymentId: {
+      type: String,
+      default: null,
+    },
     status: {
       type: String,
       enum: ["PENDING", "PAID", "FAILED"],
