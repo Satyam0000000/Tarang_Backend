@@ -31,6 +31,7 @@ function runMiddleware(req,res,fn){
 
 export default async function handler(req,res) {
 
+    console.log("🔥 registerEvent API HIT");
     await runMiddleware(req,res,corsMiddleware);
 
     // ✅ Allow CORS preflight requests
