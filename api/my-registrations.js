@@ -56,7 +56,7 @@ export default async function handler(req, res) {
 
     // ✅ Fetch current user details
     const user = await User.findOne({ email })
-      .select("name email createdAt")
+      .select("fullname email createdAt")
       .lean();
 
     console.log("📌 Fetching registrations for:", email);
