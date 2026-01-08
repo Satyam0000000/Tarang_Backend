@@ -2,6 +2,14 @@ import connectDB from "../../utils/connectDB.js";
 import PendingOrder from "../../models/PendingOrder.js";
 
 export default async function handler(req, res) {
+  // ✅ CORS headers (allow frontend to access this API)
+  res.setHeader("Access-Control-Allow-Origin", "https://www.tarangclub.online");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  // ✅ Handle preflight request
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
   const { orderId } = req.query;
 
   // Only GET allowed
