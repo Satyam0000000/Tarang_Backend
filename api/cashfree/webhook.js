@@ -41,11 +41,12 @@ export default async function handler(req, res) {
 
     const event = JSON.parse(rawBody.toString());
     const { type, data } = event;
+    console.log("Webhook type received:", type);
 
     console.log("✅ Cashfree webhook received:", type);
 
-    // ✅ Payment success
-    if (type === "PAYMENT_SUCCESS") {
+    // ✅ Payment success (supports Cashfree v2025-01-01)
+    if (type && type.includes("PAYMENT_SUCCESS")) {
       const orderId = data.order.order_id;
       const cfPaymentId = data.payment.cf_payment_id;
 
