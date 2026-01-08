@@ -2,6 +2,7 @@ import connectDB from "../utils/connectDB.js";
 import EventRegistration from "../models/EventRegistration.js";
 import cors from "cors";
 import { authMiddleware } from "../middleware/auth.js";
+import User from "../models/User.js";
 
 const allowedOrigins = [
   "https://tarang-frontend.vercel.app",
@@ -53,6 +54,11 @@ export default async function handler(req, res) {
 
     const email = req.user.email;
 
+    // ✅ Fetch current user details
+    const user = await User.findOne({ email })
+      .select("name email createdAt")
+      .lean();
+
     console.log("📌 Fetching registrations for:", email);
 
     // ✅ Fetch all events registered by user
@@ -62,6 +68,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
+      user,
       count: registrations.length,
       data: registrations,
     });
