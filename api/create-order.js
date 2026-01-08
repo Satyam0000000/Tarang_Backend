@@ -1,10 +1,39 @@
 import axios from "axios";
+import cors from "cors";
+import { authMiddleware } from "../middleware/auth.js";
 import connectDB from "../utils/connectDB.js";
 import PendingOrder from "../models/PendingOrder.js";
+
+const allowedOrigins = [
+  "https://tarang-frontend.vercel.app",
+  "https://www.tarangclub.online",
+  "http://localhost:3000",
+  "http://localhost:5173"
+];
+
+const corsMiddleware = cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["POST", "OPTIONS"],
+  credentials: true,
+});
+
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) return reject(result);
+      return resolve(result);
+    });
+  });
+}
+
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "https://www.tarangclub.online");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  await runMiddleware(req, res, corsMiddleware);
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
@@ -13,6 +42,16 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+
+  console.log("🔌 Connecting to database...");
+  await connectDB();
+  console.log("✅ Database connected");
+
+  console.log("🔐 Authenticating user...");
+  const isAuthenticated = await authMiddleware(req, res);
+  if (!isAuthenticated) return;
+
+  console.log("✅ User authenticated:", req.user.email);
 
   try {
     const { amount, customer, registration, event } = req.body;
@@ -29,8 +68,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing amount or customer data" });
     }
 
-    await connectDB();
-
     const orderId = "ORDER_" + Date.now();
 
     // 🔹 Save pending order BEFORE payment
@@ -38,7 +75,7 @@ export default async function handler(req, res) {
       orderId,
       customerId: customer.id,
       name: customer.name,
-      email: customer.email,
+      email: req.user.email,
       phone: customer.phone,
 
       // registration details
@@ -64,7 +101,7 @@ export default async function handler(req, res) {
         customer_details: {
           customer_id: String(customer.id),
           customer_name: customer.name,
-          customer_email: customer.email,
+          customer_email: req.user.email,
           customer_phone: customer.phone,
         },
        order_meta: {
