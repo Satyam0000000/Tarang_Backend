@@ -39,19 +39,16 @@ export default async function handler(req,res) {
         return res.status(200).end();
     }
 
-    // 🔐 Authenticate user via JWT (POST only)
-    await authMiddleware(req, res);
-
-    // ⛔ STOP execution if authMiddleware already sent a response (401)
-    if (res.headersSent) {
-        return;
-    }
-
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Method not allowed" });
     }
 
+    // ✅ Connect DB BEFORE auth (required for User query)
     await connectDB();
+
+    // 🔐 Authenticate user via JWT
+    const isAuth = await authMiddleware(req, res);
+    if (!isAuth) return;
 
     try {
       const {
