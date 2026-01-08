@@ -1,6 +1,7 @@
 import connectDB from "../utils/connectDB.js";
 import EventRegistration from "../models/EventRegistration.js"
 import cors from "cors"
+import { authMiddleware } from "../middleware/auth.js";
 
 const allowedOrigins = [
     "https://tarang-frontend.vercel.app",
@@ -32,6 +33,9 @@ export default async function handler(req,res) {
 
     await runMiddleware(req,res,corsMiddleware);
 
+    // 🔐 Authenticate user via JWT
+    await authMiddleware(req, res);
+
 if(req.method !== "POST")
     return res.status(405).json({message: "Method not allowed"});
 await connectDB();
@@ -44,6 +48,9 @@ try {
     paymentStatus,
   } = req.body;
 
+  // 🔑 Get trusted email from logged-in user
+  const email = req.user.email;
+
   // ❌ Block paid registrations here
   if (amount > 0 || paymentStatus === "PAID") {
     return res.status(400).json({
@@ -55,6 +62,7 @@ try {
   // ✅ Save FREE event only
   const registration = new EventRegistration({
     ...req.body,
+    email,              // ✅ email from JWT / User DB
     amount: 0,
     paymentStatus: "FREE",
   });
