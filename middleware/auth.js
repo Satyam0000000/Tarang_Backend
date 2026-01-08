@@ -11,6 +11,8 @@ export async function authMiddleware(req, res) {
 
     const token = authHeader.split(" ")[1];
 
+    console.log("JWT_SECRET:", process.env.JWT_SECRET);
+
     // 🔑 Verify JWT (matches login.js payload)
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
