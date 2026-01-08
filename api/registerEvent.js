@@ -41,47 +41,54 @@ export default async function handler(req,res) {
     // 🔐 Authenticate user via JWT (POST only)
     await authMiddleware(req, res);
 
-if(req.method !== "POST")
-    return res.status(405).json({message: "Method not allowed"});
-await connectDB();
+    // ⛔ STOP execution if authMiddleware already sent a response (401)
+    if (res.headersSent) {
+        return;
+    }
 
-try {
-  const {
-    eventId,
-    eventName,
-    amount,
-    paymentStatus,
-  } = req.body;
+    if (req.method !== "POST") {
+        return res.status(405).json({ message: "Method not allowed" });
+    }
 
-  // 🔑 Get trusted email from logged-in user
-  const email = req.user.email;
+    await connectDB();
 
-  // ❌ Block paid registrations here
-  if (amount > 0 || paymentStatus === "PAID") {
-    return res.status(400).json({
-      success: false,
-      message: "Paid events are handled via payment gateway only",
-    });
-  }
+    try {
+      const {
+        eventId,
+        eventName,
+        amount,
+        paymentStatus,
+      } = req.body;
 
-  // ✅ Save FREE event only
-  const registration = new EventRegistration({
-    ...req.body,
-    email,              // ✅ email from JWT / User DB
-    amount: 0,
-    paymentStatus: "FREE",
-  });
+      // 🔑 Get trusted email from logged-in user
+      const email = req.user.email;
 
-  await registration.save();
+      // ❌ Block paid registrations here
+      if (amount > 0 || paymentStatus === "PAID") {
+        return res.status(400).json({
+          success: false,
+          message: "Paid events are handled via payment gateway only",
+        });
+      }
 
-  res.status(201).json({
-    success: true,
-    message: "Free event registration successful",
-  });
-} catch (err) {
-  res.status(500).json({
-    success: false,
-    message: err.message,
-  });
-}
+      // ✅ Save FREE event only
+      const registration = new EventRegistration({
+        ...req.body,
+        email,              // ✅ email from JWT / User DB
+        amount: 0,
+        paymentStatus: "FREE",
+      });
+
+      await registration.save();
+
+      res.status(201).json({
+        success: true,
+        message: "Free event registration successful",
+      });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: err.message,
+      });
+    }
 }
