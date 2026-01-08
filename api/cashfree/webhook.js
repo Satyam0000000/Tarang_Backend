@@ -1,18 +1,14 @@
-import express from "express";
-import bodyParser from "body-parser";
 import { Cashfree, CFEnvironment } from "cashfree-pg";
 import connectDB from "../../utils/connectDB.js";
 import PendingOrder from "../../models/PendingOrder.js";
 import EventRegistration from "../../models/EventRegistration.js";
 
-const router = express.Router();
-
-// 🔴 Raw body middleware (REQUIRED for Cashfree)
-router.use(
-  bodyParser.raw({
-    type: "*/*",
-  })
-);
+// 🚨 REQUIRED: disable bodyParser to access raw body
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 const cashfree = new Cashfree(
   CFEnvironment.SANDBOX, // change to PRODUCTION in live
@@ -20,25 +16,38 @@ const cashfree = new Cashfree(
   process.env.CF_SECRET_KEY
 );
 
-router.post("/cashfree/webhook", async (req, res) => {
+export default async function handler(req, res) {
+  // Cashfree always sends POST
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method Not Allowed" });
+  }
+
   try {
-    // 🔐 Verify webhook signature (official Cashfree method)
+    // 🔴 Read RAW request body
+    const chunks = [];
+    for await (const chunk of req) {
+      chunks.push(chunk);
+    }
+    const rawBody = Buffer.concat(chunks);
+
+    // 🔐 Verify Cashfree webhook signature
     cashfree.PGVerifyWebhookSignature(
       req.headers["x-webhook-signature"],
-      req.body,
+      rawBody,
       req.headers["x-webhook-timestamp"]
     );
 
-    // ✅ Signature verified
     await connectDB();
 
-    const event = JSON.parse(req.body.toString());
+    const event = JSON.parse(rawBody.toString());
     const { type, data } = event;
 
-    // ✅ Handle successful payment
+    console.log("✅ Cashfree webhook received:", type);
+
+    // ✅ Payment success
     if (type === "PAYMENT_SUCCESS") {
-      const orderId = data.order?.order_id;
-      const cfPaymentId = data.payment?.cf_payment_id;
+      const orderId = data.order.order_id;
+      const cfPaymentId = data.payment.cf_payment_id;
 
       const pending = await PendingOrder.findOne({ orderId });
 
@@ -59,9 +68,9 @@ router.post("/cashfree/webhook", async (req, res) => {
       }
     }
 
-    // ❌ Handle failed payment
+    // ❌ Payment failed
     if (type === "PAYMENT_FAILED") {
-      const orderId = data.order?.order_id;
+      const orderId = data.order.order_id;
       await PendingOrder.findOneAndUpdate(
         { orderId },
         { status: "FAILED" }
@@ -70,9 +79,7 @@ router.post("/cashfree/webhook", async (req, res) => {
 
     return res.status(200).json({ success: true });
   } catch (err) {
-    console.error("Cashfree webhook verification failed:", err.message);
-    return res.status(400).json({ message: "Invalid webhook signature" });
+    console.error("❌ Cashfree webhook error:", err.message);
+    return res.status(400).json({ message: "Webhook verification failed" });
   }
-});
-
-export default router;
+}
