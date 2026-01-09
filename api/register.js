@@ -53,16 +53,29 @@ export default async function handler(req,res) {
         await newUser.save();
 
         //sending verification mail
-         await resend.emails.send({
-                from: 'Tarang Club <no-reply@tarangclub.online>',
+         
+        try{
+            await resend.emails.send({
+                from: 'Acme <onboarding@resend.dev>',
                 to: email,
                 subject: 'OTP verification',
                 html: `<p>Your OTP is <strong>${OTP}</strong></p>
                         <p>Valid for 5 minutes.</p>`,
             });
-
+        console.log("Email sent successfully:", emailResponse);
         res.status(201).json({message: "OTP sent to mail"})
-    }catch (err){
+        
+        } catch (emailError){
+            console.error("Email sending failed:", emailError);
+            // Delete the user if email fails
+            await User.deleteOne({email});
+            return res.status(500).json({
+                message: "Failed to send OTP email. Please try again.",
+                error: emailError.messag
+        })
+
+    }}catch (err){
+        console.error("Registration error:", err);
         res.status(500).json({message: "Registration failed", error: err.message})
     }
 }

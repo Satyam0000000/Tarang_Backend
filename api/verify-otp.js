@@ -39,7 +39,7 @@ try {
         return res.status(404).json({ message: "User not found" });
     if(Date.now() > newUser.otpExpiry )
         return res.status(400).json({message: "OTP Expired"})
-    if(newUser.emailOTP !== email_OTP)
+    if(Number(newUser.emailOTP) !== Number(email_OTP))
         return res.status(400).json({message: "OTP Incorrect"})
 
     newUser.isVerified = true;
