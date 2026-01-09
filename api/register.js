@@ -2,6 +2,7 @@ import bcrypt from "bcrypt"
 import connectDB from "../utils/connectDB.js"
 import User from "../models/User.js"
 import cors from "cors"
+import { Resend } from 'resend';
 
 const allowedOrigins = [
     "https://tarang-frontend.vercel.app",
@@ -27,6 +28,7 @@ function runMiddleware(req,res,fn){
         })
     })
 }
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req,res) {
 
@@ -37,16 +39,30 @@ export default async function handler(req,res) {
 
     await connectDB();
     const {fullName, email, password} = req.body;
+    const OTP = Math.floor(100000 + Math.random() * 900000);
+    const OTP_expiry = Date.now() + 5 * 60 * 1000
 
     try{
         const existingUser = await User.findOne({email});
         if (existingUser)
             return res.status(400).json({message : "User already exists"})
+
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({fullName, email, password: hashedPassword})
+        const newUser = new User({fullName, email, password: hashedPassword, emailOTP: OTP, otpExpiry: OTP_expiry, isVerified: false})
+
         await newUser.save();
-        res.status(201).json({message: "Registration successfull"})
+
+        //sending verification mail
+         await resend.emails.send({
+                from: 'Tarang Club <no-reply@tarangclub.online>',
+                to: email,
+                subject: 'OTP verification',
+                html: `<p>Your OTP is <strong>${OTP}</strong></p>
+                        <p>Valid for 5 minutes.</p>`,
+            });
+
+        res.status(201).json({message: "OTP sent to mail"})
     }catch (err){
-        res.status(500).json({message: "Registration failed", error: err.mesaage})
+        res.status(500).json({message: "Registration failed", error: err.message})
     }
 }
