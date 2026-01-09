@@ -56,7 +56,7 @@ export default async function handler(req,res) {
          
         try{
             await resend.emails.send({
-                from: 'Acme <onboarding@resend.dev>',
+                from: 'Tarang Club <noreply@tarangclub.online>',
                 to: email,
                 subject: 'OTP verification',
                 html: `<p>Your OTP is <strong>${OTP}</strong></p>
