@@ -12,7 +12,7 @@ const corsMiddleware = cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(null, flase);
     }
   },
   methods: ["POST", "OPTIONS"],
