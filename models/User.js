@@ -1,5 +1,4 @@
-import cors from "cors";
-import User from "../model/User.js";
+import User from "../models/User.js";
 import connectDB from "../utils/connectDB.js";
 
 const allowedOrigins = [
