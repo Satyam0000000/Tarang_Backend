@@ -1,9 +1,10 @@
 import axios from "axios";
 import cors from "cors";
+import connectDB from "../utils/connectDB.js";
 import { authMiddleware } from "../middleware/auth.js";
 import PendingOrder from "../models/PendingOrder.js";
 import corsMiddleware from "../middleware/cors.js";
-import { runMiddleware, connectDB } from "../utils/runMiddleware.js";
+import { runMiddleware} from "../utils/runMiddleware.js";
 
 export default async function handler(req, res) {
 

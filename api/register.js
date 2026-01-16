@@ -1,7 +1,6 @@
 import bcrypt from "bcrypt"
 import connectDB from "../utils/connectDB.js"
 import User from "../models/User.js"
-import cors from "cors"
 import { Resend } from 'resend';
 import corsMiddleware from "../middleware/cors.js";
 import { runMiddleware } from "../utils/runMiddleware.js";

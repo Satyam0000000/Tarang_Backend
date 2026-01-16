@@ -1,6 +1,5 @@
 import User from "../models/User.js";
 import connectDB from "../utils/connectDB.js";
-import cors from "cors"
 import corsMiddleware from "../middleware/cors.js";
 import { runMiddleware } from "../utils/runMiddleware.js";
 

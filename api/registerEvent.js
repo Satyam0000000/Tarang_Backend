@@ -1,6 +1,5 @@
 import connectDB from "../utils/connectDB.js";
 import EventRegistration from "../models/EventRegistration.js";
-import cors from "cors";
 import { authMiddleware } from "../middleware/auth.js";
 import corsMiddleware from "../middleware/cors.js";
 import { runMiddleware } from "../utils/runMiddleware.js";
