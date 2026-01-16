@@ -2,35 +2,8 @@ import connectDB from "../utils/connectDB.js";
 import EventRegistration from "../models/EventRegistration.js";
 import cors from "cors";
 import { authMiddleware } from "../middleware/auth.js";
-
-const allowedOrigins = [
-  "https://tarang-frontend.vercel.app",
-  "https://www.tarangclub.online",
-  "http://localhost:3000",
-  "http://localhost:5173"
-];
-
-const corsMiddleware = cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["POST", "OPTIONS"],
-  credentials: true,
-});
-
-// Middleware helper
-function runMiddleware(req, res, fn) {
-  return new Promise((resolve, reject) => {
-    fn(req, res, (result) => {
-      if (result instanceof Error) return reject(result);
-      return resolve(result);
-    });
-  });
-}
+import corsMiddleware from "../middleware/cors.js";
+import { runMiddleware } from "../utils/runMiddleware.js";
 
 export default async function handler(req, res) {
   console.log("🔥 registerEvent API HIT");
