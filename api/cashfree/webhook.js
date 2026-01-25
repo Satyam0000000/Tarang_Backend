@@ -1,4 +1,4 @@
-import { Cashfree, CFEnvironment } from "cashfree-pg";
+import crypto from "crypto";
 import connectDB from "../../utils/connectDB.js";
 import PendingOrder from "../../models/PendingOrder.js";
 import EventRegistration from "../../models/EventRegistration.js";
@@ -10,11 +10,26 @@ export const config = {
   },
 };
 
-const cashfree = new Cashfree(
-  CFEnvironment.SANDBOX, // change to PRODUCTION in live
-  process.env.CF_APP_ID,
-  process.env.CF_SECRET_KEY
-);
+function verifySignature(req, rawBody) {
+  const timestamp = req.headers["x-webhook-timestamp"];
+  const receivedSignature = req.headers["x-webhook-signature"];
+
+  if (!timestamp || !receivedSignature) {
+    throw new Error("Missing webhook headers");
+  }
+
+  const secretKey = process.env.CF_SECRET_KEY; // Cashfree client secret
+  const signStr = timestamp + rawBody;
+
+  const expectedSignature = crypto
+    .createHmac("sha256", secretKey)
+    .update(signStr)
+    .digest("base64");
+
+  if (expectedSignature !== receivedSignature) {
+    throw new Error("Signature mismatch");
+  }
+}
 
 export default async function handler(req, res) {
   // Cashfree always sends POST
@@ -30,12 +45,14 @@ export default async function handler(req, res) {
     }
     const rawBody = Buffer.concat(chunks);
 
-    // 🔐 Verify Cashfree webhook signature
-    cashfree.PGVerifyWebhookSignature(
-      req.headers["x-webhook-signature"],
-      rawBody,
-      req.headers["x-webhook-timestamp"]
-    );
+    // Verify signature (HMAC SHA256)
+    try {
+      verifySignature(req, rawBody.toString());
+      console.log(" Signature verified");
+    } catch (err) {
+      console.error(" Signature verification failed:", err.message);
+      return res.status(200).json({ received: true, error: "Invalid signature" });
+    }
 
     await connectDB();
 
