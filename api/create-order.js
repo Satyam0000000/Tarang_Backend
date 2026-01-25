@@ -67,6 +67,24 @@ export default async function handler(req, res) {
       status: "PENDING",
     });
 
+    // Add this right before axios.post
+console.log("Sending to Cashfree:");
+console.log("APP_ID:", process.env.CF_APP_ID);
+console.log("SECRET_KEY:", process.env.CF_SECRET_KEY ? "EXISTS" : "MISSING");
+console.log("Payload:", JSON.stringify({
+  order_id: orderId,
+  order_amount: amount,
+  order_currency: "INR",
+  customer_details: {
+    customer_id: String(customer.id),
+    customer_name: customer.name,
+    customer_email: req.user.email,
+    customer_phone: customer.phone,
+  }
+}, null, 2));
+
+
+
     const response = await axios.post(
       "https://api.cashfree.com/pg/orders",
       {
