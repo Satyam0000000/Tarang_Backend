@@ -52,6 +52,7 @@ export default async function handler(req, res) {
       heardFrom,
       eventId,
       eventName,
+      eventLink,
       amount,
       paymentStatus,
     } = req.body;
@@ -105,6 +106,7 @@ export default async function handler(req, res) {
       heardFrom,
       eventId,
       eventName,
+      eventLink,
       email: req.user.email, // ✅ Email from JWT
       amount: 0,
       paymentStatus: "FREE",
@@ -120,6 +122,7 @@ export default async function handler(req, res) {
       message: "Free event registration successful",
       data: {
         eventName,
+        eventLink,
         email: req.user.email,
         registeredAt: registration.registeredAt
       }

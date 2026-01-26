@@ -33,6 +33,9 @@ const EventRegistrationSchema = new mongoose.Schema(
     paymentId: {
       type: String, // Cashfree cf_payment_id
     },
+    eventLink: {
+      type: String,
+    }
   },
   { timestamps: true }
 );

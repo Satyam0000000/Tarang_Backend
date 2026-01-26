@@ -62,6 +62,7 @@ export default async function handler(req, res) {
       // event details
       eventId: event?.eventId,
       eventName: event?.eventName,
+      eventLink: event?.eventLink,
 
       amount,
       status: "PENDING",

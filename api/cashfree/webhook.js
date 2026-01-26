@@ -76,6 +76,7 @@ export default async function handler(req, res) {
           phone: pending.phone,
           eventId: pending.eventId,
           eventName: pending.eventName,
+          eventLink: pending.eventLink,
           amount: pending.amount,
           paymentStatus: "PAID",
           paymentId: cfPaymentId,

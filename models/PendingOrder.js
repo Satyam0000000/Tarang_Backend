@@ -47,6 +47,9 @@ const PendingOrderSchema = new mongoose.Schema(
       enum: ["PENDING", "PAID", "FAILED"],
       default: "PENDING",
     },
+    eventLink: {
+      type: String,
+    }
   },
   { timestamps: true }
 );
