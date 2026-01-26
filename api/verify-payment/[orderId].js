@@ -41,6 +41,7 @@ export default async function handler(req, res) {
         email: order.email,
         eventName: order.eventName,
         amount: order.amount,
+        eventLink: order.eventLink || null,
       },
     });
   } catch (err) {
