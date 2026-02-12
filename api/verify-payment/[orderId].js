@@ -32,15 +32,29 @@ export default async function handler(req, res) {
       return res.status(404).json({ status: "FAILED" });
     }
 
-    // ✅ Return DB truth (used by PaymentSuccess page)
+    //  Return DB truth (used by PaymentSuccess page)
     return res.status(200).json({
       status: order.status, // PAID | PENDING | FAILED
       paymentId: order.paymentId || null,
       details: {
-        name: order.name,
-        email: order.email,
-        eventName: order.eventName,
-        amount: order.amount,
+        // User details
+        fullName: order.fullName || order.name || null,
+        collegeName: order.collegeName || null,
+        phone: order.phone || null,
+        email: order.email || null,
+        degree: order.degree || null,
+        year: order.year || null,
+        heardFrom: order.heardFrom || null,
+        wantToSpeak: order.wantToSpeak || null,
+
+        // Event details
+        eventId: order.eventId || null,
+        eventName: order.eventName || null,
+
+        // Payment details
+        amount: order.amount || 0,
+        paymentStatus: order.status || null,
+        paymentId: order.paymentId || null,
         eventLink: order.eventLink || null,
       },
     });
