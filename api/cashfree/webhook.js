@@ -71,15 +71,28 @@ export default async function handler(req, res) {
 
       if (pending && pending.status !== "PAID") {
         await EventRegistration.create({
-          fullName: pending.name,
-          email: pending.email,
-          phone: pending.phone,
+          // User details
+          fullName: pending.fullName || pending.name || null,
+          collegeName: pending.collegeName || null,
+          phone: pending.phone || null,
+          email: pending.email || null,
+          degree: pending.degree || null,
+          year: pending.year || null,
+          heardFrom: pending.heardFrom || null,
+          wantToSpeak: pending.wantToSpeak || null,
+
+          // Event details
           eventId: pending.eventId,
           eventName: pending.eventName,
-          eventLink: pending.eventLink,
-          amount: pending.amount,
+          eventLink: pending.eventLink || null,
+
+          // Payment details
+          amount: pending.amount || 0,
           paymentStatus: "PAID",
           paymentId: cfPaymentId,
+
+          // Order status (extra safety)
+          status: pending.status || "PAID",
         });
 
         pending.status = "PAID";
