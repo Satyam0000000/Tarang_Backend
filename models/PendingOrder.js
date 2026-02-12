@@ -22,10 +22,9 @@ const PendingOrderSchema = new mongoose.Schema(
     degree: String,
     year: String,
     heardFrom: String,
-    
+
     wantToSpeak: {
       type: String,
-      enum: ["Favour of Motion", "Against the Motion"],
     },
 
     // event details
