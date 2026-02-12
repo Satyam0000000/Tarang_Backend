@@ -29,7 +29,10 @@ export default async function handler(req, res) {
   console.log("✅ User authenticated:", req.user.email);
 
   try {
-    const { amount, customer, registration, event } = req.body;
+    const { amount, customer, registration, userData, event } = req.body;
+
+    // ✅ support both FREE & PAID flows
+    const reg = registration || userData;
 
     console.log("Backend received body:", req.body);
 
@@ -54,11 +57,11 @@ export default async function handler(req, res) {
       phone: customer.phone,
 
       // registration details
-      collegeName: registration?.collegeName,
-      degree: registration?.degree,
-      year: registration?.year,
-      heardFrom: registration?.heardFrom,
-      wantToSpeak: registration?.wantToSpeak,
+      collegeName: reg?.collegeName,
+      degree: reg?.degree,
+      year: reg?.year,
+      heardFrom: reg?.heardFrom,
+      wantToSpeak: reg?.wantToSpeak,
 
       // event details
       eventId: event?.eventId,
