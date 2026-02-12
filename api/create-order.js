@@ -58,6 +58,7 @@ export default async function handler(req, res) {
       degree: registration?.degree,
       year: registration?.year,
       heardFrom: registration?.heardFrom,
+      wantToSpeak: registration?.wantToSpeak,
 
       // event details
       eventId: event?.eventId,
